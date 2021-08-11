@@ -16,13 +16,21 @@ def detect(image):
     image = cv.imread(image)
     gray = cv.cvtColor(image, cv.COLOR_BGR2GRAY)
     blurred = cv.blur(gray, (10, 10))
-    #blurred = cv.medianBlur(gray, 5)
-    _, threshold = cv.threshold(blurred, 127, 225, cv.THRESH_BINARY)
-    #threshold2 = cv.adaptiveThreshold(blurred, 255, cv.ADAPTIVE_THRESH_MEAN_C, cv.THRESH_BINARY, 11, 2)
+    #blurred = cv.medianBlur(gray, 21)
+    _, threshold = cv.threshold(blurred, 100, 225, cv.THRESH_BINARY_INV)
+    #threshold = cv.adaptiveThreshold(blurred, 255, cv.ADAPTIVE_THRESH_MEAN_C, cv.THRESH_BINARY, 11, 2)
     contours, hierarchy = cv.findContours(threshold, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)
-    cv.drawContours(image, contours, -1, (0, 255, 0), 3)
+
+    approx = []
+    for contour in contours:
+        epsilon = 0.1 * cv.arcLength(contour, True)
+        approx.append(cv.approxPolyDP(contour, epsilon, True))
+
+    # Showing images created
+    #cv.drawContours(image, contours, -1, (0, 255, 0), 3)
+    cv.drawContours(image, approx, -1, (0, 255, 0), 3)
     cv.imshow('Original image', image)
-    cv.imshow('Gray image', gray)
+    #cv.imshow('Gray image', gray)
     cv.imshow('Blurred image', blurred)
     cv.imshow("Thresholded Image", threshold)
     #cv.imshow("Adaptive Thresholded Image", threshold2)
